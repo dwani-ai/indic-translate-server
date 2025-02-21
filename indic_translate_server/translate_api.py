@@ -5,15 +5,12 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from IndicTransToolkit import IndicProcessor
 from typing import List
 import argparse
+import os
 
 import uvicorn
 # recommended to run this on a gpu with flash_attn installed
 # don't set attn_implemetation if you don't have flash_attn
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-
-# Define the default source and target languages
-src_lang = "eng_Latn"
-tgt_lang = "kan_Knda"
 
 # Function to initialize the model based on the source and target languages
 def initialize_model(src_lang, tgt_lang):
@@ -37,9 +34,6 @@ def initialize_model(src_lang, tgt_lang):
     ).to(DEVICE)
 
     return tokenizer, model
-
-# Initialize the model with default languages
-tokenizer, model = initialize_model(src_lang, tgt_lang)
 
 ip = IndicProcessor(inference=True)
 
@@ -104,8 +98,8 @@ async def translate(request: TranslationRequest):
 # Function to parse command-line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="Translation Server")
-    parser.add_argument("--src_lang", type=str, default="eng_Latn", help="Source language code")
-    parser.add_argument("--tgt_lang", type=str, default="kan_Knda", help="Target language code")
+    parser.add_argument("--src_lang", type=str, default=os.getenv('SRC_LANG', 'eng_Latn'), help="Source language code")
+    parser.add_argument("--tgt_lang", type=str, default=os.getenv('TGT_LANG', 'kan_Knda'), help="Target language code")
     return parser.parse_args()
 
 # Run the server using Uvicorn
@@ -114,7 +108,7 @@ if __name__ == "__main__":
     src_lang = args.src_lang
     tgt_lang = args.tgt_lang
 
-    # Reinitialize the model with the provided languages
+    # Initialize the model with the provided languages
     tokenizer, model = initialize_model(src_lang, tgt_lang)
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

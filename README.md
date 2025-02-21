@@ -57,7 +57,7 @@ Indic Translate Server
 - Run with fastapi server 
   - ``` uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 8000```
     - or
-  - ```python indic_translate_server/translate_api.py```
+  - ```python indic_translate_server/translate_api.py --src_lang eng_Latn --tgt_lang kan_Knda```
 
 
 

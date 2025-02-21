@@ -6,6 +6,9 @@ services:
     restart: unless-stopped
     ports:
       - 8000:8000
+    environment:
+      - SRC_LANG=eng_Latn
+      - TGT_LANG=kan_Knda
     deploy:
       resources:
         reservations:
