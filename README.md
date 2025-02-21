@@ -1,22 +1,7 @@
 Indic Translate Server
 
-- Use model from AI4Bharat for Translation
-
-
-- Indic to English
-    - huggingface-cli download ai4bharat/indictrans2-indic-en-dist-200M
-
-- English to Indic
-    - huggingface-cli download ai4bharat/indictrans2-en-indic-1B
-- Indic to Indic
-  - huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M
-
-- pip install -r requirements.txt 
-
-- Run with fastapi server 
-  - ``` uvicorn translate_api:app --host 0.0.0.0 --port 8000```
-
-  - ```python translate_api.py```
+- Run With Docker compose 
+  - docker compose -f compose.yaml up -d
 
 - Evaluate result
 
@@ -53,6 +38,27 @@ Indic Translate Server
             "tgt_lang": "eng_Latn"
             }'
     ```
+
+
+- Setup Dev Environment
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
+- Download model from AI4Bharat for Translation
+  - Indic to English
+      - huggingface-cli download ai4bharat/indictrans2-indic-en-dist-200M
+
+  - English to Indic
+      - huggingface-cli download ai4bharat/indictrans2-en-indic-1B
+  - Indic to Indic
+    - huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M
+
+- Run with fastapi server 
+  - ``` uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 8000```
+    - or
+  - ```python indic_translate_server/translate_api.py```
+
 
 
 - Reference
