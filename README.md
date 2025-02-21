@@ -58,4 +58,5 @@ Indic Translate Server
 - Reference
     - https://huggingface.co/ai4bharat/indictrans2-indic-en-dist-200M
     - https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface
+    - pip install git+https://github.com/VarunGumma/IndicTransToolkit.git
 
