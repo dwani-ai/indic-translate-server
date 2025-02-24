@@ -1,8 +1,29 @@
 # Indic Translate Server
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Running with Docker Compose](#running-with-docker-compose)
+- [Evaluating Results](#evaluating-results)
+- [Setting Up the Development Environment](#setting-up-the-development-environment)
+- [Downloading Translation Models](#downloading-translation-models)
+- [Running with FastAPI Server](#running-with-fastapi-server)
+- [Build Docker Image](#build-docker-image)
+- [References](#references)
+- [Contributing](#contributing)
+- [License](#license)
+- [FAQ](#faq)
+
 ## Overview
 
 This project sets up an Indic translation server using Docker Compose, allowing translation between various languages including English, Kannada, Hindi, and others. It utilizes models from AI4Bharat to perform translations.
+
+## Prerequisites
+
+- Docker and Docker Compose installed on your machine.
+- Python 3.x installed for the development environment.
+- Internet access to download translation models.
 
 ## Running with Docker Compose
 
@@ -44,6 +65,13 @@ curl -X POST "http://localhost:8000/translate" \
      }'
 ```
 
+**Response:**
+```json
+{
+  "translations": ["ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"]
+}
+```
+
 ### Kannada to English
 ```bash
 curl -X POST "http://localhost:8000/translate" \
@@ -55,6 +83,13 @@ curl -X POST "http://localhost:8000/translate" \
      }'
 ```
 
+**Response:**
+```json
+{
+  "translations": ["Hello, how are you?", "Good morning!"]
+}
+```
+
 ### Hindi to English
 ```bash
 curl -X POST "http://localhost:8000/translate" \
@@ -64,6 +99,13 @@ curl -X POST "http://localhost:8000/translate" \
        "src_lang": "hin_Deva",
        "tgt_lang": "eng_Latn"
      }'
+```
+
+**Response:**
+```json
+{
+  "translations": ["Hello world", "How are you?"]
+}
 ```
 
 ## Setting Up the Development Environment
@@ -115,10 +157,9 @@ Alternatively, you can specify source and target languages directly:
 python indic_translate_server/translate_api.py --src_lang eng_Latn --tgt_lang kan_Knda
 ```
 
-
-## Build Docker image
-```bash 
-  docker build -t slabstech/indic_translate_server -f Dockerfile.dev .
+## Build Docker Image
+```bash
+docker build -t slabstech/indic_translate_server -f Dockerfile.dev .
 ```
 
 ## References
@@ -127,6 +168,28 @@ python indic_translate_server/translate_api.py --src_lang eng_Latn --tgt_lang ka
 - [AI4Bharat IndicTrans2 GitHub Repository](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface)
 - [IndicTransToolkit](https://github.com/VarunGumma/IndicTransToolkit.git)
 - Extra - pip install git+https://github.com/VarunGumma/IndicTransToolkit.git
+
+## Contributing
+
+We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## FAQ
+
+**Q: How do I change the source and target languages?**
+
+A: Modify the `compose.yaml` file to set the `SRC_LANG` and `TGT_LANG` variables as needed.
+
+**Q: How do I download the translation models?**
+
+A: Use the `huggingface-cli` commands provided in the [Downloading Translation Models](#downloading-translation-models) section.
+
+**Q: How do I run the server locally?**
+
+A: Follow the instructions in the [Running with FastAPI Server](#running-with-fastapi-server) section.
 
 ---
 
