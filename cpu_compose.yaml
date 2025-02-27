@@ -1,0 +1,7 @@
+services:
+  indic-translate-server:
+    image: slabstech/indic_translate_server_cpu
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    ports:
+      - 7860:7860

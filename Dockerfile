@@ -1,23 +1,31 @@
-FROM pytorch/pytorch:2.6.0-cuda12.6-cudnn9-runtime
-# hadolint ignore=DL3008,DL3015,DL4006
-RUN apt-get update && \
-    apt-get install -y git curl software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y python3.12 python3-distutils && \
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-WORKDIR /root/indic_translate_server
-#RUN pip3.12 install --no-cache-dir --no-deps git+https://github.com/huggingface/parler-tts.git 
-#COPY ./model_requirements.txt .
-#RUN pip3.12 install --no-cache-dir -r model_requirements.txt
-#COPY ./server_requirements.txt .
-#RUN pip3.12 install --no-cache-dir -r server_requirements.txt
-COPY ./requirements.txt .
-RUN pip3.12 install --no-cache-dir -r requirements.txt
+FROM nvidia/cuda:12.8.0-cudnn-devel-ubuntu22.04
 
-COPY ./indic_translate_server ./indic_translate_server
-CMD ["uvicorn", "indic_translate_server.translate_api:app"]
-ENV UVICORN_HOST=0.0.0.0
-ENV UVICORN_PORT=8000
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip python3-distutils python3-dev python3-venv \
+    git \
+    ffmpeg \
+    sudo \
+    wget curl software-properties-common build-essential gcc g++ \
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN export CC=/usr/bin/gcc
+RUN export CXX=/usr/bin/g++
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN useradd -ms /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 7860
+
+# Use absolute path for clarity
+CMD ["python", "/app/src/translate_api.py", "--host", "0.0.0.0", "--port", "7860", "--device", "cuda", "--use_distilled"]
