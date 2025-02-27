@@ -1,6 +1,6 @@
 services:
   indic-translate-server:
-    image: slabstech/indic_translate_server
+    image: slabstech/indic_translate_server_12_6
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
     restart: unless-stopped
