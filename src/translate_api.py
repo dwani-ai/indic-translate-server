@@ -3,29 +3,29 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from IndicTransToolkit import IndicProcessor
-from typing import List
+from typing import List, Dict
 import argparse
 import os
 from fastapi.responses import RedirectResponse
 import uvicorn
 
 # Recommended to run this on a GPU with flash_attn installed
-# Don't set attn_implemetation if you don't have flash_attn
+# Don't set attn_implementation if you don't have flash_attn
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 class TranslateManager:
-    def __init__(self, src_lang, tgt_lang, device_type=DEVICE):
+    def __init__(self, src_lang, tgt_lang, device_type=DEVICE, use_distilled=True):
         self.device_type = device_type
-        self.tokenizer, self.model = self.initialize_model(src_lang, tgt_lang)
+        self.tokenizer, self.model = self.initialize_model(src_lang, tgt_lang, use_distilled)
 
-    def initialize_model(self, src_lang, tgt_lang):
-        # Determine the model name based on the source and target languages
+    def initialize_model(self, src_lang, tgt_lang, use_distilled):
+        # Determine the model name based on the source and target languages and the model type
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
-            model_name = "ai4bharat/indictrans2-en-indic-dist-200M"  # English to Indic
+            model_name = "ai4bharat/indictrans2-en-indic-dist-200M" if use_distilled else "ai4bharat/indictrans2-en-indic-1B"
         elif not src_lang.startswith("eng") and tgt_lang.startswith("eng"):
-            model_name = "ai4bharat/indictrans2-indic-en-dist-200M"  # Indic to English
+            model_name = "ai4bharat/indictrans2-indic-en-dist-200M" if use_distilled else "ai4bharat/indictrans2-indic-en-1B"
         elif not src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
-            model_name = "ai4bharat/indictrans2-indic-indic-dist-320M"  # Indic to Indic
+            model_name = "ai4bharat/indictrans2-indic-indic-dist-320M" if use_distilled else "ai4bharat/indictrans2-indic-indic-1B"
         else:
             raise ValueError("Invalid language combination: English to English translation is not supported.")
 
@@ -37,12 +37,34 @@ class TranslateManager:
             torch_dtype=torch.float16,  # performance might slightly vary for bfloat16
             attn_implementation="flash_attention_2"
         ).to(self.device_type)
-
         return tokenizer, model
 
-ip = IndicProcessor(inference=True)
+class ModelManager:
+    def __init__(self, device_type=DEVICE, use_distilled=True):
+        self.models: Dict[str, TranslateManager] = {}
+        self.device_type = device_type
+        self.use_distilled = use_distilled
+        self.preload_models()
 
+    def preload_models(self):
+        # Preload all models at startup
+        self.models['eng_indic'] = TranslateManager('eng_Latn', 'kan_Knda', self.device_type, self.use_distilled)
+        self.models['indic_eng'] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
+        self.models['indic_indic'] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
+
+    def get_model(self, src_lang, tgt_lang) -> TranslateManager:
+        if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
+            return self.models['eng_indic']
+        elif not src_lang.startswith("eng") and tgt_lang.startswith("eng"):
+            return self.models['indic_eng']
+        elif not src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
+            return self.models['indic_indic']
+        else:
+            raise ValueError("Invalid language combination: English to English translation is not supported.")
+
+ip = IndicProcessor(inference=True)
 app = FastAPI()
+model_manager = ModelManager()
 
 class TranslationRequest(BaseModel):
     sentences: List[str]
@@ -52,8 +74,8 @@ class TranslationRequest(BaseModel):
 class TranslationResponse(BaseModel):
     translations: List[str]
 
-def get_translate_manager(src_lang: str, tgt_lang: str, device_type: str) -> TranslateManager:
-    return TranslateManager(src_lang, tgt_lang, device_type)
+def get_translate_manager(src_lang: str, tgt_lang: str) -> TranslateManager:
+    return model_manager.get_model(src_lang, tgt_lang)
 
 @app.get("/")
 async def home():
@@ -104,27 +126,24 @@ async def translate(request: TranslationRequest, translate_manager: TranslateMan
 
     # Postprocess the translations, including entity replacement
     translations = ip.postprocess_batch(generated_tokens, lang=tgt_lang)
-
     return TranslationResponse(translations=translations)
 
 # Function to parse command-line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="Translation Server")
-    parser.add_argument("--src_lang", type=str, default=os.getenv('SRC_LANG', 'eng_Latn'), help="Source language code")
-    parser.add_argument("--tgt_lang", type=str, default=os.getenv('TGT_LANG', 'kan_Knda'), help="Target language code")
     parser.add_argument("--port", type=int, default=7860, help="Port to run the server on.")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the server on.")
     parser.add_argument("--device", type=str, default="cuda", help="Device type to run the model on (cuda or cpu).")
+    parser.add_argument("--use_distilled", action="store_true", help="Use distilled models instead of base models.")
     return parser.parse_args()
 
 # Run the server using Uvicorn
 if __name__ == "__main__":
     args = parse_args()
-    src_lang = args.src_lang
-    tgt_lang = args.tgt_lang
     device_type = args.device
+    use_distilled = args.use_distilled
 
-    # Initialize the model with the provided languages
-    translate_manager = TranslateManager(src_lang, tgt_lang, device_type)
+    # Initialize the model manager
+    model_manager = ModelManager(device_type, use_distilled)
 
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")

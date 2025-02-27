@@ -20,6 +20,62 @@
 
 This project sets up an Indic translation server using Docker Compose, allowing translation between various languages including English, Kannada, Hindi, and others. It utilizes models from AI4Bharat to perform translations.
 
+###  Languages Supported
+Here is the list of languages supported by the IndicTrans2 models:
+
+<table>
+<tbody>
+  <tr>
+    <td>Assamese (asm_Beng)</td>
+    <td>Kashmiri (Arabic) (kas_Arab)</td>
+    <td>Punjabi (pan_Guru)</td>
+  </tr>
+  <tr>
+    <td>Bengali (ben_Beng)</td>
+    <td>Kashmiri (Devanagari) (kas_Deva)</td>
+    <td>Sanskrit (san_Deva)</td>
+  </tr>
+  <tr>
+    <td>Bodo (brx_Deva)</td>
+    <td>Maithili (mai_Deva)</td>
+    <td>Santali (sat_Olck)</td>
+  </tr>
+  <tr>
+    <td>Dogri (doi_Deva)</td>
+    <td>Malayalam (mal_Mlym)</td>
+    <td>Sindhi (Arabic) (snd_Arab)</td>
+  </tr>
+  <tr>
+    <td>English (eng_Latn)</td>
+    <td>Marathi (mar_Deva)</td>
+    <td>Sindhi (Devanagari) (snd_Deva)</td>
+  </tr>
+  <tr>
+    <td>Konkani (gom_Deva)</td>
+    <td>Manipuri (Bengali) (mni_Beng)</td>
+    <td>Tamil (tam_Taml)</td>
+  </tr>
+  <tr>
+    <td>Gujarati (guj_Gujr)</td>
+    <td>Manipuri (Meitei) (mni_Mtei)</td>
+    <td>Telugu (tel_Telu)</td>
+  </tr>
+  <tr>
+    <td>Hindi (hin_Deva)</td>
+    <td>Nepali (npi_Deva)</td>
+    <td>Urdu (urd_Arab)</td>
+  </tr>
+  <tr>
+    <td>Kannada (kan_Knda)</td>
+    <td>Odia (ory_Orya)</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
 ### Live Server
 
 We have hosted an Translation service for Indian languages. The service is available in two modes:
@@ -91,26 +147,6 @@ curl -X 'POST' \
    docker compose -f compose.yaml up -d
    ```
 
-2. **Update source and target languages:**
-   Modify the `compose.yaml` file to set the source (`SRC_LANG`) and target (`TGT_LANG`) languages as per your requirements. Example configurations:
-   - **English to Indic:**
-     ```yaml
-     SRC_LANG: eng_Latn
-     TGT_LANG: kan_Knda
-     ```
-   - **Indic to English:**
-     ```yaml
-     SRC_LANG: kan_Knda
-     TGT_LANG: eng_Latn
-     ```
-   - **Indic to Indic:**
-     ```yaml
-     SRC_LANG: kan_Knda
-     TGT_LANG: hin_Deva
-     ```
-
-
-
 ## Setting Up the Development Environment
 
 1. **Create a virtual environment:**
@@ -128,36 +164,34 @@ curl -X 'POST' \
    pip install -r requirements.txt
    ```
 
-## Downloading Translation Models
 
-Models can be downloaded from AI4Bharat's HuggingFace repository:
 
-### Indic to English
-```bash
-huggingface-cli download ai4bharat/indictrans2-indic-en-dist-200M
-```
+### Model Downloads for Translation
 
-### English to Indic
-```bash
-huggingface-cli download ai4bharat/indictrans2-en-indic-1B
-```
+- Collection Models on HuggingFace - [IndicTrans2](https://huggingface.co/collections/ai4bharat/indictrans2-664ccb91d23bbae0d681c3ca)
 
-### Indic to Indic
-```bash
-huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M
-```
+Below is a table summarizing the available models for different translation tasks:
+
+| Task                | Variant                | Model Name                                     | VRAM Size  | Download Command                                               |
+|---------------------|------------------------|-----------------------------------------------|------------|----------------------------------------------------------------|
+| Indic to English    | 200M (distilled)                  | indictrans2-indic-en-dist-200M                 | 950 MB     | `huggingface-cli download ai4bharat/indictrans2-indic-en-dist-200M`  |
+|                     | 1B (base)                     | indictrans2-indic-en-1B                       | 4.5 GB     | `huggingface-cli download ai4bharat/indictrans2-indic-en-1B`       |
+| English to Indic    | 200M (distilled)       | indictrans2-en-indic-dist-200M                 | 950 MB     | `huggingface-cli download ai4bharat/indictrans2-en-indic-dist-200M`  |
+|                     | 1B (base)              | indictrans2-en-indic-1B                       | 4.5 GB     | `huggingface-cli download ai4bharat/indictrans2-en-indic-1B`       |
+| Indic to Indic      | 320M (distilled)       | indictrans2-indic-indic-dist-320M             | 950 MB     | `huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M`|
+|                     | 1B (base)              | indictrans2-indic-indic-1B                   | 4.5 GB     | `huggingface-cli download ai4bharat/indictrans2-indic-indic-1B`     |
 
 ## Running with FastAPI Server
 
 You can run the server using FastAPI:
 1. with GPU 
 ```bash
-python src/translate_api.py --src_lang kan_Knda --tgt_lang eng_Latn --port 7860 --host 0.0.0.0 --device cuda
+python src/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
 ```
 
 2. with CPU only
 ```bash
-python src/translate_api.py --src_lang kan_Knda --tgt_lang eng_Latn --port 7860 --host 0.0.0.0 --device cpu
+python src/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
 ```
 
 ## Evaluating Results
@@ -167,7 +201,7 @@ You can evaluate the translation results using `curl` commands. Here are some ex
 ### English to Kannada
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate' \
+  'http://localhost:7860/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -213,6 +247,8 @@ curl -X 'POST' \
 }
 ```
 
+
+### Kannada to Hindi 
 ```
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
@@ -220,27 +256,22 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   -d '{
   "sentences": [
-     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
   ],
   "src_lang": "kan_Knda",
   "tgt_lang": "eng_Latn"
 }'
 ```
 
-Response 
-{
-  "translations": [
-    "Hello, how are you?",
-    "Good morning!"
-  ]
-}
+### Response
 
 
+### Hindi to Kannada
 
 ----
 
-cpu
-
+### CPU
+```
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
   -H 'accept: application/json' \
@@ -252,7 +283,10 @@ curl -X 'POST' \
   "src_lang": "kan_Knda",
   "tgt_lang": "eng_Latn"
 }'
+```
 
+### Response
+```
 {
   "translations": [
     "Hello, how are you?",
@@ -260,7 +294,7 @@ curl -X 'POST' \
   ]
 }
 
-
+```
 
 
 ## Build Docker Image
@@ -276,7 +310,7 @@ docker build -t slabstech/indic_translate_server_ -f Dockerfile.cpu .
 
 
 ## References
-
+- [IndicTrans2 Paper](https://openreview.net/pdf?id=vfT4YuzAYA)
 - [AI4Bharat IndicTrans2 Model](https://huggingface.co/ai4bharat/indictrans2-indic-en-dist-200M)
 - [AI4Bharat IndicTrans2 GitHub Repository](https://github.com/AI4Bharat/IndicTrans2/tree/main/huggingface_interface)
 - [IndicTransToolkit](https://github.com/VarunGumma/IndicTransToolkit.git)
@@ -305,5 +339,26 @@ A: Use the `huggingface-cli` commands provided in the [Downloading Translation M
 A: Follow the instructions in the [Running with FastAPI Server](#running-with-fastapi-server) section.
 
 ---
+#### License
 
+- [IndicTrans License](https://github.com/AI4Bharat/IndicTrans2?tab=MIT-1-ov-file#readme)
+- [IndicTrans Data License](https://github.com/AI4Bharat/IndicTrans2?tab=readme-ov-file#license)
+
+
+--- 
 This README provides a comprehensive guide to setting up and running the Indic Translate Server. For more details, refer to the linked resources.
+
+
+## Citation
+
+```bibtex
+@article{gala2023indictrans,
+title={IndicTrans2: Towards High-Quality and Accessible Machine Translation Models for all 22 Scheduled Indian Languages},
+author={Jay Gala and Pranjal A Chitale and A K Raghavan and Varun Gumma and Sumanth Doddapaneni and Aswanth Kumar M and Janki Atul Nawale and Anupama Sujatha and Ratish Puduppully and Vivek Raghavan and Pratyush Kumar and Mitesh M Khapra and Raj Dabre and Anoop Kunchukuttan},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2023},
+url={https://openreview.net/forum?id=vfT4YuzAYA},
+note={}
+}
+```

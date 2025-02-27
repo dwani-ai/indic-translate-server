@@ -5,10 +5,9 @@ services:
       - ~/.cache/huggingface:/root/.cache/huggingface
     restart: unless-stopped
     ports:
-      - 8000:8000
+      - 7860:7860
     environment:
-      - SRC_LANG=eng_Latn
-      - TGT_LANG=kan_Knda
+      - USE_DISTILLED=true
     deploy:
       resources:
         reservations:

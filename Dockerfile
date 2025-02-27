@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     python3 \
-    python3-pip python3-distutils python3-dev python3-venv\
+    python3-pip python3-distutils python3-dev python3-venv \
     git \
     ffmpeg \
     sudo \
@@ -28,4 +28,4 @@ USER appuser
 EXPOSE 7860
 
 # Use absolute path for clarity
-CMD ["python", "/app/src/translate_api.py", "--host", "0.0.0.0", "--port", "7860", "--device", "cuda"]
+CMD ["python", "/app/src/translate_api.py", "--host", "0.0.0.0", "--port", "7860", "--device", "cuda", "--use-distilled", "${USE_DISTILLED}"]
