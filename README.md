@@ -320,6 +320,8 @@ docker build -t slabstech/indic_translate_server_ -f Dockerfile.cpu .
 
 We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
 
+Also you can join the [discord group](https://discord.gg/WZMCerEZ2P) to collaborate
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
