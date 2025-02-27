@@ -56,31 +56,42 @@ You can evaluate the translation results using `curl` commands. Here are some ex
 
 ### English to Kannada
 ```bash
-curl -X POST "http://localhost:8000/translate" \
- -H "Content-Type: application/json" \
- -d '{
-       "sentences": ["Hello, how are you?", "Good morning!"],
-       "src_lang": "eng_Latn",
-       "tgt_lang": "kan_Knda"
-     }'
+curl -X 'POST' \
+  'http://localhost:7860/translate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "Hello, how are you?", "Good morning!"
+  ],
+  "src_lang": "eng_Latn",
+  "tgt_lang": "kan_Knda"
+}'
 ```
 
 **Response:**
 ```json
 {
-  "translations": ["ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"]
+  "translations": [
+    "ಹಲೋ, ಹೇಗಿದ್ದೀರಿ? ",
+    "ಶುಭೋದಯ! "
+  ]
 }
 ```
 
 ### Kannada to English
 ```bash
-curl -X POST "http://localhost:8000/translate" \
- -H "Content-Type: application/json" \
- -d '{
-       "sentences": ["ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"],
-       "src_lang": "kan_Knda",
-       "tgt_lang": "eng_Latn"
-     }'
+curl -X 'POST' \
+  'http://localhost:7860/translate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
 ```
 
 **Response:**
@@ -92,7 +103,7 @@ curl -X POST "http://localhost:8000/translate" \
 
 ### Hindi to English
 ```bash
-curl -X POST "http://localhost:8000/translate" \
+curl -X POST "http://localhost:7860/translate" \
  -H "Content-Type: application/json" \
  -d '{
        "sentences": ["नमस्ते दुनिया", "आप कैसे हो?"],
@@ -149,8 +160,10 @@ huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M
 You can run the server using FastAPI:
 
 ```bash
-uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 8000 --src_lang eng_Latn --tgt_lang kan_Knda
+uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 7860 --src_lang eng_Latn --tgt_lang kan_Knda
 ```
+
+python src/translate_api.py --src_lang kan_Knda --tgt_lang --port 7860 --host 0.0.0.0 --device cuda
 
 Alternatively, you can specify source and target languages directly:
 ```bash
