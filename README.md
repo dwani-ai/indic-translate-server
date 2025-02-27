@@ -94,6 +94,21 @@ curl -X 'POST' \
 }'
 ```
 
+```
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+
 **Response:**
 ```json
 {
@@ -118,6 +133,54 @@ curl -X POST "http://localhost:7860/translate" \
   "translations": ["Hello world", "How are you?"]
 }
 ```
+
+
+
+```
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+{
+  "translations": [
+    "Hello, how are you?",
+    "Good morning!"
+  ]
+}
+
+
+
+----
+
+cpu
+
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+
+{
+  "translations": [
+    "Hello, how are you?",
+    "Good morning!"
+  ]
+}
 
 ## Setting Up the Development Environment
 
@@ -164,6 +227,9 @@ uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 7860 --sr
 ```
 
 python src/translate_api.py --src_lang kan_Knda --tgt_lang --port 7860 --host 0.0.0.0 --device cuda
+
+python src/translate_api.py --src_lang kan_Knda --tgt_lang eng_Latn --port 7860 --host 0.0.0.0 --device cuda
+
 
 Alternatively, you can specify source and target languages directly:
 ```bash

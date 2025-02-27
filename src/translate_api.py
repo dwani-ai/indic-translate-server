@@ -1,5 +1,5 @@
 import torch
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from IndicTransToolkit import IndicProcessor
@@ -52,12 +52,15 @@ class TranslationRequest(BaseModel):
 class TranslationResponse(BaseModel):
     translations: List[str]
 
+def get_translate_manager(src_lang: str, tgt_lang: str, device_type: str) -> TranslateManager:
+    return TranslateManager(src_lang, tgt_lang, device_type)
+
 @app.get("/")
 async def home():
     return RedirectResponse(url="/docs")
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate(request: TranslationRequest, translate_manager: TranslateManager):
+async def translate(request: TranslationRequest, translate_manager: TranslateManager = Depends(get_translate_manager)):
     input_sentences = request.sentences
     src_lang = request.src_lang
     tgt_lang = request.tgt_lang
