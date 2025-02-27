@@ -3,12 +3,13 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Live Server](#live-server)
 - [Prerequisites](#prerequisites)
 - [Running with Docker Compose](#running-with-docker-compose)
-- [Evaluating Results](#evaluating-results)
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
 - [Downloading Translation Models](#downloading-translation-models)
 - [Running with FastAPI Server](#running-with-fastapi-server)
+- [Evaluating Results](#evaluating-results)
 - [Build Docker Image](#build-docker-image)
 - [References](#references)
 - [Contributing](#contributing)
@@ -18,6 +19,64 @@
 ## Overview
 
 This project sets up an Indic translation server using Docker Compose, allowing translation between various languages including English, Kannada, Hindi, and others. It utilizes models from AI4Bharat to perform translations.
+
+### Live Server
+
+We have hosted an Translation service for Indian languages. The service is available in two modes:
+
+#### High Latency, Slow System (Available 24/7)
+- **URL**: [High Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
+
+#### Low Latency, Fast System (Available on Request)
+- **URL**: [Low Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server)
+
+### How to Use the Service
+
+1. With curl
+
+You can test the service using `curl` commands. Below are examples for both service modes:
+
+#### High Latency Service
+
+
+```
+curl -X 'POST' \
+  'https://gaganyatri-translate-indic-server-cpu.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+#### Low Latency Service - GPU server on demand
+```
+curl -X 'POST' \
+  'https://gaganyatri-translate-indic-server.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=gpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+
+
+2. Via Swagger UI 
+
+- **URL**: [High Latency translation Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
+
+- **URL**: [Low Latency translation Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
+
+
 
 ## Prerequisites
 
@@ -50,137 +109,7 @@ This project sets up an Indic translation server using Docker Compose, allowing 
      TGT_LANG: hin_Deva
      ```
 
-## Evaluating Results
 
-You can evaluate the translation results using `curl` commands. Here are some examples:
-
-### English to Kannada
-```bash
-curl -X 'POST' \
-  'http://localhost:7860/translate' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-    "Hello, how are you?", "Good morning!"
-  ],
-  "src_lang": "eng_Latn",
-  "tgt_lang": "kan_Knda"
-}'
-```
-
-**Response:**
-```json
-{
-  "translations": [
-    "ಹಲೋ, ಹೇಗಿದ್ದೀರಿ? ",
-    "ಶುಭೋದಯ! "
-  ]
-}
-```
-
-### Kannada to English
-```bash
-curl -X 'POST' \
-  'http://localhost:7860/translate' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
-
-```
-curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
-
-
-**Response:**
-```json
-{
-  "translations": ["Hello, how are you?", "Good morning!"]
-}
-```
-
-### Hindi to English
-```bash
-curl -X POST "http://localhost:7860/translate" \
- -H "Content-Type: application/json" \
- -d '{
-       "sentences": ["नमस्ते दुनिया", "आप कैसे हो?"],
-       "src_lang": "hin_Deva",
-       "tgt_lang": "eng_Latn"
-     }'
-```
-
-**Response:**
-```json
-{
-  "translations": ["Hello world", "How are you?"]
-}
-```
-
-
-
-```
-curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
-
-{
-  "translations": [
-    "Hello, how are you?",
-    "Good morning!"
-  ]
-}
-
-
-
-----
-
-cpu
-
-curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-
-{
-  "translations": [
-    "Hello, how are you?",
-    "Good morning!"
-  ]
-}
 
 ## Setting Up the Development Environment
 
@@ -221,25 +150,130 @@ huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M
 ## Running with FastAPI Server
 
 You can run the server using FastAPI:
-
+1. with GPU 
 ```bash
-uvicorn indic_translate_server/translate_api:app --host 0.0.0.0 --port 7860 --src_lang eng_Latn --tgt_lang kan_Knda
-```
-
-python src/translate_api.py --src_lang kan_Knda --tgt_lang --port 7860 --host 0.0.0.0 --device cuda
-
 python src/translate_api.py --src_lang kan_Knda --tgt_lang eng_Latn --port 7860 --host 0.0.0.0 --device cuda
-
-
-Alternatively, you can specify source and target languages directly:
-```bash
-python indic_translate_server/translate_api.py --src_lang eng_Latn --tgt_lang kan_Knda
 ```
+
+2. with CPU only
+```bash
+python src/translate_api.py --src_lang kan_Knda --tgt_lang eng_Latn --port 7860 --host 0.0.0.0 --device cpu
+```
+
+## Evaluating Results
+
+You can evaluate the translation results using `curl` commands. Here are some examples:
+
+### English to Kannada
+```bash
+curl -X 'POST' \
+  'http://localhost:7860/translate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "Hello, how are you?", "Good morning!"
+  ],
+  "src_lang": "eng_Latn",
+  "tgt_lang": "kan_Knda"
+}'
+```
+
+**Response:**
+```json
+{
+  "translations": [
+    "ಹಲೋ, ಹೇಗಿದ್ದೀರಿ? ",
+    "ಶುಭೋದಯ! "
+  ]
+}
+```
+
+### Kannada to English
+
+```
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+
+**Response:**
+```json
+{
+  "translations": ["Hello, how are you?", "Good morning!"]
+}
+```
+
+```
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+
+Response 
+{
+  "translations": [
+    "Hello, how are you?",
+    "Good morning!"
+  ]
+}
+
+
+
+----
+
+cpu
+
+curl -X 'POST' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+
+{
+  "translations": [
+    "Hello, how are you?",
+    "Good morning!"
+  ]
+}
+
+
+
 
 ## Build Docker Image
+1. GPU 
 ```bash
-docker build -t slabstech/indic_translate_server -f Dockerfile.dev .
+docker build -t slabstech/indic_translate_server -f Dockerfile .
 ```
+2. CPU only
+```bash
+docker build -t slabstech/indic_translate_server_ -f Dockerfile.cpu .
+```
+
+
 
 ## References
 
