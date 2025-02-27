@@ -5,5 +5,3 @@ services:
       - ~/.cache/huggingface:/root/.cache/huggingface
     ports:
       - 7860:7860
-    environment:
-        - USE_DISTILLED=true
