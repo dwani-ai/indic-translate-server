@@ -80,10 +80,10 @@ Here is the list of languages supported by the IndicTrans2 models:
 
 We have hosted an Translation service for Indian languages. The service is available in two modes:
 
-#### High Latency, Slow System (Available 24/7)
+#### Available 24/7 - Free, Slow 
 - **URL**: [High Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
 
-#### Low Latency, Fast System (Available on Request)
+#### Paused, On-demand, $.05 /hour, Fast
 - **URL**: [Low Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server)
 
 ### How to Use the Service
@@ -92,8 +92,7 @@ We have hosted an Translation service for Indian languages. The service is avail
 
 You can test the service using `curl` commands. Below are examples for both service modes:
 
-#### High Latency Service
-
+#### Available 24/7 - Free, Slow
 
 ```
 curl -X 'POST' \
@@ -109,7 +108,7 @@ curl -X 'POST' \
 }'
 ```
 
-#### Low Latency Service - GPU server on demand
+#### Paused, On-demand, $.05 /hour, Fast
 ```
 curl -X 'POST' \
   'https://gaganyatri-translate-indic-server.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=gpu' \
