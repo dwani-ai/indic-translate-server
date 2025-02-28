@@ -40,11 +40,13 @@ class TranslateManager:
         return tokenizer, model
 
 class ModelManager:
-    def __init__(self, device_type=DEVICE, use_distilled=True):
+    def __init__(self, device_type=DEVICE, use_distilled=True, is_lazy_loading=False):
         self.models: Dict[str, TranslateManager] = {}
         self.device_type = device_type
         self.use_distilled = use_distilled
-        self.preload_models()
+        self.is_lazy_loading = is_lazy_loading
+        if not is_lazy_loading:
+            self.preload_models()
 
     def preload_models(self):
         # Preload all models at startup
@@ -54,13 +56,26 @@ class ModelManager:
 
     def get_model(self, src_lang, tgt_lang) -> TranslateManager:
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
-            return self.models['eng_indic']
+            key = 'eng_indic'
         elif not src_lang.startswith("eng") and tgt_lang.startswith("eng"):
-            return self.models['indic_eng']
+            key = 'indic_eng'
         elif not src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
-            return self.models['indic_indic']
+            key = 'indic_indic'
         else:
             raise ValueError("Invalid language combination: English to English translation is not supported.")
+
+        if key not in self.models:
+            if self.is_lazy_loading:
+                if key == 'eng_indic':
+                    self.models[key] = TranslateManager('eng_Latn', 'kan_Knda', self.device_type, self.use_distilled)
+                elif key == 'indic_eng':
+                    self.models[key] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
+                elif key == 'indic_indic':
+                    self.models[key] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
+            else:
+                raise ValueError(f"Model for {key} is not preloaded and lazy loading is disabled.")
+
+        return self.models[key]
 
 ip = IndicProcessor(inference=True)
 app = FastAPI()
@@ -135,6 +150,7 @@ def parse_args():
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the server on.")
     parser.add_argument("--device", type=str, default="cuda", help="Device type to run the model on (cuda or cpu).")
     parser.add_argument("--use_distilled", action="store_true", help="Use distilled models instead of base models.")
+    parser.add_argument("--is_lazy_loading", action="store_true", help="Enable lazy loading of models.")
     return parser.parse_args()
 
 # Run the server using Uvicorn
@@ -142,8 +158,9 @@ if __name__ == "__main__":
     args = parse_args()
     device_type = args.device
     use_distilled = args.use_distilled
+    is_lazy_loading = args.is_lazy_loading
 
     # Initialize the model manager
-    model_manager = ModelManager(device_type, use_distilled)
+    model_manager = ModelManager(device_type, use_distilled, is_lazy_loading)
 
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
