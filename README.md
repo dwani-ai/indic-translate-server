@@ -303,7 +303,7 @@ docker build -t slabstech/indic_translate_server -f Dockerfile .
 ```
 2. CPU only
 ```bash
-docker build -t slabstech/indic_translate_server_ -f Dockerfile.cpu .
+docker build -t slabstech/indic_translate_server_cpu -f Dockerfile.cpu .
 ```
 
 
