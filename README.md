@@ -74,8 +74,6 @@ Here is the list of languages supported by the IndicTrans2 models:
 </table>
 
 
-
-
 ### Live Server
 
 We have hosted an Translation service for Indian languages. The service is available in two modes:
@@ -83,8 +81,6 @@ We have hosted an Translation service for Indian languages. The service is avail
 #### Available 24/7 - Free, Slow 
 - **URL**: [High Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
 
-#### Paused, On-demand, $.05 /hour, Fast
-- **URL**: [Low Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server)
 
 ### How to Use the Service
 
@@ -107,7 +103,7 @@ curl -X 'POST' \
   "tgt_lang": "eng_Latn"
 }'
 ```
-
+<!-- 
 #### Paused, On-demand, $.05 /hour, Fast
 ```
 curl -X 'POST' \
@@ -122,7 +118,7 @@ curl -X 'POST' \
   "tgt_lang": "eng_Latn"
 }'
 ```
-
+-->
 
 
 2. Via Swagger UI 
