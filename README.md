@@ -78,69 +78,17 @@ Here is the list of languages supported by the IndicTrans2 models:
 
 We have hosted an Translation service for Indian languages. The service is available in two modes:
 
-#### Available 24/7 - Free, Slow 
-- **URL**: [High Latency ASR Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
+####  
+- [API](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
 
-
-### How to Use the Service
-
-1. With curl
-
-You can test the service using `curl` commands. Below are examples for both service modes:
-
-#### Available 24/7 - Free, Slow
-
-```
-curl -X 'POST' \
-  'https://gaganyatri-translate-indic-server-cpu.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
-<!-- 
-#### Paused, On-demand, $.05 /hour, Fast
-```
-curl -X 'POST' \
-  'https://gaganyatri-translate-indic-server.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=gpu' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
--->
-
-
-2. Via Swagger UI 
-
-- **URL**: [High Latency translation Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
-
-- **URL**: [Low Latency translation Service](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
-
+- [Gradio UX]()
 
 
 ## Prerequisites
 
-- Docker and Docker Compose installed on your machine.
-- Python 3.x installed for the development environment.
+- Python 3.10 installed for the development environment.
 - Internet access to download translation models.
 
-## Running with Docker Compose
-
-1. **Start the server:**
-   ```bash
-   docker compose -f compose.yaml up -d
-   ```
 
 ## Setting Up the Development Environment
 
@@ -158,8 +106,6 @@ curl -X 'POST' \
    ```bash
    pip install -r requirements.txt
    ```
-
-
 
 ### Model Downloads for Translation
 
@@ -220,7 +166,7 @@ curl -X 'POST' \
 
 ### Kannada to English
 
-```
+```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
@@ -244,7 +190,7 @@ curl -X 'POST' \
 
 
 ### Kannada to Hindi 
-```
+```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
@@ -266,7 +212,7 @@ curl -X 'POST' \
 ----
 
 ### CPU
-```
+```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
   -H 'accept: application/json' \
@@ -281,27 +227,14 @@ curl -X 'POST' \
 ```
 
 ### Response
-```
+```json
 {
   "translations": [
     "Hello, how are you?",
     "Good morning!"
   ]
 }
-
 ```
-
-
-## Build Docker Image
-1. GPU 
-```bash
-docker build -t slabstech/indic_translate_server -f Dockerfile .
-```
-2. CPU only
-```bash
-docker build -t slabstech/indic_translate_server_cpu -f Dockerfile.cpu .
-```
-
 
 
 ## References
@@ -359,3 +292,65 @@ url={https://openreview.net/forum?id=vfT4YuzAYA},
 note={}
 }
 ```
+
+
+<!--
+
+
+### How to Use the Service
+
+1. With curl
+
+You can test the service using `curl` commands. Below are examples for both service modes:
+
+#### Available 24/7 - Free, Slow
+
+```
+curl -X 'POST' \
+  'https://gaganyatri-translate-indic-server-cpu.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+
+#### Paused, On-demand, $.05 /hour, Fast
+```
+curl -X 'POST' \
+  'https://gaganyatri-translate-indic-server.hf.space/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=gpu' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "sentences": [
+     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
+  ],
+  "src_lang": "kan_Knda",
+  "tgt_lang": "eng_Latn"
+}'
+```
+-->
+
+
+<!-- 
+## Build Docker Image
+1. GPU 
+```bash
+docker build -t slabstech/indic_translate_server -f Dockerfile .
+```
+2. CPU only
+```bash
+docker build -t slabstech/indic_translate_server_cpu -f Dockerfile.cpu .
+```
+
+## Running with Docker Compose
+- Docker and Docker Compose installed on your machine.
+
+1. **Start the server:**
+   ```bash
+   docker compose -f compose.yaml up -d
+   ```
+-->
