@@ -61,7 +61,7 @@ def chunk_text(text, chunk_size):
         chunks.append(' '.join(words[i:i + chunk_size]))
     return chunks
 
-@spaces.ZERO_GPU
+@spaces.GPU
 def translate_text(transcription, src_lang, tgt_lang, use_gpu=False):
     logging.info(f"Translating text: {transcription}, src_lang: {src_lang}, tgt_lang: {tgt_lang}, use_gpu: {use_gpu}")
 
