@@ -86,7 +86,8 @@ We have hosted an Translation service for Indian languages. The service is avail
 
 ## Prerequisites
 
-- Python 3.10 installed for the development environment.
+- Python 3.10  + VsCode
+- Ubuntu 22.04 
 - Internet access to download translation models.
 
 
@@ -122,7 +123,86 @@ Below is a table summarizing the available models for different translation task
 | Indic to Indic      | 320M (distilled)       | indictrans2-indic-indic-dist-320M             | 950 MB     | `huggingface-cli download ai4bharat/indictrans2-indic-indic-dist-320M`|
 |                     | 1B (base)              | indictrans2-indic-indic-1B                   | 4.5 GB     | `huggingface-cli download ai4bharat/indictrans2-indic-indic-1B`     |
 
-## Running with FastAPI Server
+### Sample Code
+```python
+import torch
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from IndicTransToolkit import IndicProcessor
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+src_lang, tgt_lang = "hin_Deva", "eng_Latn"
+model_name = "ai4bharat/indictrans2-indic-en-dist-200M"
+tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+model = AutoModelForSeq2SeqLM.from_pretrained(
+    model_name, 
+    trust_remote_code=True, 
+    torch_dtype=torch.float16, # performance might slightly vary for bfloat16
+    attn_implementation="flash_attention_2"
+).to(DEVICE)
+
+ip = IndicProcessor(inference=True)
+
+input_sentences = [
+    "जब मैं छोटा था, मैं हर रोज़ पार्क जाता था।",
+    "हमने पिछले सप्ताह एक नई फिल्म देखी जो कि बहुत प्रेरणादायक थी।",
+]
+
+batch = ip.preprocess_batch(
+    input_sentences,
+    src_lang=src_lang,
+    tgt_lang=tgt_lang,
+)
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Tokenize the sentences and generate input encodings
+inputs = tokenizer(
+    batch,
+    truncation=True,
+    padding="longest",
+    return_tensors="pt",
+    return_attention_mask=True,
+).to(DEVICE)
+
+# Generate translations using the model
+with torch.no_grad():
+    generated_tokens = model.generate(
+        **inputs,
+        use_cache=True,
+        min_length=0,
+        max_length=256,
+        num_beams=5,
+        num_return_sequences=1,
+    )
+
+# Decode the generated tokens into text
+with tokenizer.as_target_tokenizer():
+    generated_tokens = tokenizer.batch_decode(
+        generated_tokens.detach().cpu().tolist(),
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=True,
+    )
+
+# Postprocess the translations, including entity replacement
+translations = ip.postprocess_batch(generated_tokens, lang=tgt_lang)
+
+for input_sentence, translation in zip(input_sentences, translations):
+    print(f"{src_lang}: {input_sentence}")
+    print(f"{tgt_lang}: {translation}")
+
+```
+- Run the sample code
+```bash
+python translate_code.py
+```
+
+
+
+### Alternate forms of Development 
+
+#### Running with FastAPI Server
 
 You can run the server using FastAPI:
 1. with GPU 
@@ -135,11 +215,11 @@ python src/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_disti
 python src/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
 ```
 
-## Evaluating Results
+### Evaluating Results for FastAPI Server
 
 You can evaluate the translation results using `curl` commands. Here are some examples:
 
-### English to Kannada
+#### English to Kannada
 ```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
@@ -164,7 +244,7 @@ curl -X 'POST' \
 }
 ```
 
-### Kannada to English
+#### Kannada to English
 
 ```bash
 curl -X 'POST' \
@@ -189,7 +269,7 @@ curl -X 'POST' \
 ```
 
 
-### Kannada to Hindi 
+#### Kannada to Hindi 
 ```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
@@ -207,11 +287,11 @@ curl -X 'POST' \
 ### Response
 
 
-### Hindi to Kannada
+#### Hindi to Kannada
 
 ----
 
-### CPU
+#### CPU
 ```bash
 curl -X 'POST' \
   'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
