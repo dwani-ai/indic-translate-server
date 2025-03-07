@@ -208,15 +208,21 @@ python translate_code.py
 
 #### Running with FastAPI Server
 
+**Install dependencies:**
+   ```bash
+   pip install -r server-requirements.txt
+   ```
+
+
 You can run the server using FastAPI:
 1. with GPU 
 ```bash
-python src/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
 ```
 
 2. with CPU only
 ```bash
-python src/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
 ```
 
 ### Evaluating Results for FastAPI Server
