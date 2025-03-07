@@ -5,7 +5,6 @@
 - [Overview](#overview)
 - [Live Server](#live-server)
 - [Prerequisites](#prerequisites)
-- [Running with Docker Compose](#running-with-docker-compose)
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
 - [Downloading Translation Models](#downloading-translation-models)
 - [Running with FastAPI Server](#running-with-fastapi-server)
@@ -81,7 +80,7 @@ We have hosted an Translation service for Indian languages. The service is avail
 ####  
 - [API](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
 
-- [Gradio UX]()
+
 
 
 ## Prerequisites
@@ -193,12 +192,12 @@ for input_sentence, translation in zip(input_sentences, translations):
     print(f"{tgt_lang}: {translation}")
 
 ```
-- Run the sample code
+
+
+### Run the sample code
 ```bash
 python translate_code.py
 ```
-
-
 
 ### Alternate forms of Development 
 
