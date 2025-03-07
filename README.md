@@ -98,9 +98,14 @@ We have hosted an Translation service for Indian languages. The service is avail
    ```
 
 2. **Activate the virtual environment:**
-   ```bash
-   source venv/bin/activate
-   ```
+  - For Mac/Linux
+    ```bash
+    source venv/bin/activate
+    ```
+  - On Windows, use:
+    ```bash
+    venv\Scripts\activate
+    ```
 
 3. **Install dependencies:**
    ```bash
