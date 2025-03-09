@@ -5,7 +5,6 @@
 - [Overview](#overview)
 - [Live Server](#live-server)
 - [Prerequisites](#prerequisites)
-- [Running with Docker Compose](#running-with-docker-compose)
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
 - [Downloading Translation Models](#downloading-translation-models)
 - [Running with FastAPI Server](#running-with-fastapi-server)
@@ -81,7 +80,7 @@ We have hosted an Translation service for Indian languages. The service is avail
 ####  
 - [API](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
 
-- [Gradio UX]()
+
 
 
 ## Prerequisites
@@ -99,9 +98,14 @@ We have hosted an Translation service for Indian languages. The service is avail
    ```
 
 2. **Activate the virtual environment:**
-   ```bash
-   source venv/bin/activate
-   ```
+  - For Mac/Linux
+    ```bash
+    source venv/bin/activate
+    ```
+  - On Windows, use:
+    ```bash
+    venv\Scripts\activate
+    ```
 
 3. **Install dependencies:**
    ```bash
@@ -193,26 +197,32 @@ for input_sentence, translation in zip(input_sentences, translations):
     print(f"{tgt_lang}: {translation}")
 
 ```
-- Run the sample code
+
+
+### Run the sample code
 ```bash
 python translate_code.py
 ```
-
-
 
 ### Alternate forms of Development 
 
 #### Running with FastAPI Server
 
+**Install dependencies:**
+   ```bash
+   pip install -r server-requirements.txt
+   ```
+
+
 You can run the server using FastAPI:
 1. with GPU 
 ```bash
-python src/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
 ```
 
 2. with CPU only
 ```bash
-python src/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
 ```
 
 ### Evaluating Results for FastAPI Server
