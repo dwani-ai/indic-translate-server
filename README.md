@@ -282,7 +282,7 @@ curl -X 'POST' \
 #### Kannada to Hindi 
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=hin_Deva' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -290,14 +290,19 @@ curl -X 'POST' \
     "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
   ],
   "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
+  "tgt_lang": "hin_Deva"
 }'
+
 ```
 
 ### Response
 
-
-#### Hindi to Kannada
+{
+  "translations": [
+    "हैलो, कैसा लग रहा है? ",
+    "गुड मॉर्निंग! "
+  ]
+}
 
 ----
 
