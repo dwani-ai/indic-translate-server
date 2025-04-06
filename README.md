@@ -390,6 +390,9 @@ note={}
 
 
 <!--
+IndicTrans3 ?
+
+https://huggingface.co/prajdabre/rotary-indictrans2-en-indic-dist-200M
 
 
 ### How to Use the Service

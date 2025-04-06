@@ -2,6 +2,10 @@ import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from IndicTransToolkit.processor import IndicProcessor
 
+
+#from transformers import init_empty_weights
+#print("init_empty_weights is available")
+
 # Load the model and tokenizer
 ip = IndicProcessor(inference=True)
 tokenizer = AutoTokenizer.from_pretrained("ai4bharat/indictrans2-en-indic-dist-200M", trust_remote_code=True)
