@@ -3,7 +3,7 @@ samples
 *.log
 venv
 *.nemo
-
+*.onnx
 # Ignore all Python files except those explicitly copied
 *.pyc
 *.pyo

@@ -3,3 +3,5 @@ onnx
 transformers
 onnxruntime
 accelerate
+onnxruntime-gpu
+
