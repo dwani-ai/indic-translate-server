@@ -1,3 +1,8 @@
 torch
 transformers
-IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git@399b3fec93d2ee85cb998cb7a4fb7a7d83afcbcf
+fastapi
+uvicorn
+pydantic
+indic-nlp-library-itt
+IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git
+numpy==1.26.4
