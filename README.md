@@ -108,7 +108,9 @@ We have hosted an Translation service for Indian languages. The service is avail
     ```
 
 3. **Install dependencies:**
-   ```bash
+   ```
+   
+pip install torch==2.7.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
    pip install -r requirements.txt
    ```
 
