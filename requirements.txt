@@ -1,8 +1,7 @@
-torch
+torch==2.7.1
 transformers
 fastapi
 uvicorn
 pydantic
 indic-nlp-library-itt
 IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git
-numpy==1.26.4
