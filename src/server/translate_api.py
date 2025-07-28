@@ -19,6 +19,7 @@ class TranslateManager:
         self.tokenizer, self.model = self.initialize_model(src_lang, tgt_lang, use_distilled)
 
     def initialize_model(self, src_lang, tgt_lang, use_distilled):
+        use_distilled = False
         # Determine the model name based on the source and target languages and the model type
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-en-indic-dist-200M" if use_distilled else "ai4bharat/indictrans2-en-indic-1B"

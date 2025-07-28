@@ -17,7 +17,9 @@
 
 ## Overview
 
-This project sets up an Indic translation server using Docker Compose, allowing translation between various languages including English, Kannada, Hindi, and others. It utilizes models from AI4Bharat to perform translations.
+This project sets up an Indic translation server, allowing translation between various languages including English, Kannada, Hindi, and others. It utilizes models from AI4Bharat to perform translations.
+
+We suggest to use non-distilled models for better translation. 
 
 ###  Languages Supported
 Here is the list of languages supported by the IndicTrans2 models:
@@ -75,12 +77,10 @@ Here is the list of languages supported by the IndicTrans2 models:
 
 ### Live Server
 
-We have hosted an Translation service for Indian languages. The service is available in two modes:
+We have hosted an Translation service for Indian languages. 
 
 ####  
-- [API](https://huggingface.co/spaces/gaganyatri/translate_indic_server_cpu)
-
-
+- [https://demo.dwani.ai](https://demo.dwani.ai)
 
 
 ## Prerequisites
@@ -217,12 +217,12 @@ python translate_code.py
 You can run the server using FastAPI:
 1. with GPU 
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled False
 ```
 
 2. with CPU only
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled
+python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled False
 ```
 
 ### Evaluating Results for FastAPI Server

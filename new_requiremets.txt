@@ -1,0 +1,6 @@
+torch
+fastapi
+transformers
+IndicTransToolkit
+uvicorn
+sentencepiece
