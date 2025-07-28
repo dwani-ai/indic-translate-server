@@ -13,6 +13,7 @@ import uvicorn
 # Don't set attn_implementation if you don't have flash_attn
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+DEVICE = "cpu"
 class TranslateManager:
     def __init__(self, src_lang, tgt_lang, device_type=DEVICE, use_distilled=True):
         self.device_type = device_type
@@ -25,6 +26,7 @@ class TranslateManager:
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-en-indic-dist-200M" if use_distilled else "ai4bharat/indictrans2-en-indic-1B"
             revision_hash = "10e65a9951a1e922cd109a95e8aba9357b62144b"
+        '''
         elif not src_lang.startswith("eng") and tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-indic-en-dist-200M" if use_distilled else "ai4bharat/indictrans2-indic-en-1B"
             revision_hash = "ac3daf0ecd37be3b6957764a9179ab2b07fa9d6a"
@@ -33,7 +35,7 @@ class TranslateManager:
             revision_hash = "24d732922a0a91d0998d5568e3af37b7a21cd705"
         else:
             raise ValueError("Invalid language combination: English to English translation is not supported.")
-
+        '''    
         # Now model_name contains the correct model based on the source and target languages
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True, revision = revision_hash)
         model = AutoModelForSeq2SeqLM.from_pretrained(
@@ -46,7 +48,7 @@ class TranslateManager:
         return tokenizer, model
 
 class ModelManager:
-    def __init__(self, device_type=DEVICE, use_distilled=True, is_lazy_loading=False):
+    def __init__(self, device_type=DEVICE, use_distilled=False, is_lazy_loading=False):
         self.models: Dict[str, TranslateManager] = {}
         self.device_type = device_type
         self.use_distilled = use_distilled
@@ -57,8 +59,8 @@ class ModelManager:
     def preload_models(self):
         # Preload all models at startup
         self.models['eng_indic'] = TranslateManager('eng_Latn', 'kan_Knda', self.device_type, self.use_distilled)
-        self.models['indic_eng'] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
-        self.models['indic_indic'] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
+        #self.models['indic_eng'] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
+        #self.models['indic_indic'] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
 
     def get_model(self, src_lang, tgt_lang) -> TranslateManager:
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
@@ -91,7 +93,7 @@ class TranslationRequest(BaseModel):
     sentences: List[str]
     src_lang: str
     tgt_lang: str
-
+ 
 class TranslationResponse(BaseModel):
     translations: List[str]
 
@@ -103,11 +105,12 @@ async def home():
     return RedirectResponse(url="/docs")
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate(request: TranslationRequest, translate_manager: TranslateManager = Depends(get_translate_manager)):
+async def translate(request: TranslationRequest):
     input_sentences = request.sentences
     src_lang = request.src_lang
     tgt_lang = request.tgt_lang
 
+    translate_manager = get_translate_manager(src_lang=src_lang, tgt_lang=tgt_lang)
     if not input_sentences:
         raise HTTPException(status_code=400, detail="Input sentences are required")
 
