@@ -21,22 +21,27 @@ class TranslateManager:
     def initialize_model(self, src_lang, tgt_lang, use_distilled):
         use_distilled = False
         # Determine the model name based on the source and target languages and the model type
+        revision_hash = "asd"
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-en-indic-dist-200M" if use_distilled else "ai4bharat/indictrans2-en-indic-1B"
+            revision_hash = "10e65a9951a1e922cd109a95e8aba9357b62144b"
         elif not src_lang.startswith("eng") and tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-indic-en-dist-200M" if use_distilled else "ai4bharat/indictrans2-indic-en-1B"
+            revision_hash = "ac3daf0ecd37be3b6957764a9179ab2b07fa9d6a"
         elif not src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
             model_name = "ai4bharat/indictrans2-indic-indic-dist-320M" if use_distilled else "ai4bharat/indictrans2-indic-indic-1B"
+            revision_hash = "24d732922a0a91d0998d5568e3af37b7a21cd705"
         else:
             raise ValueError("Invalid language combination: English to English translation is not supported.")
 
         # Now model_name contains the correct model based on the source and target languages
-        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True, revision = revision_hash)
         model = AutoModelForSeq2SeqLM.from_pretrained(
             model_name,
             trust_remote_code=True,
             torch_dtype=torch.float16,  # performance might slightly vary for bfloat16
-            attn_implementation="flash_attention_2"
+            attn_implementation="flash_attention_2",
+            revision = revision_hash
         ).to(self.device_type)
         return tokenizer, model
 
