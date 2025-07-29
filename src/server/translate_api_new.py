@@ -45,6 +45,7 @@ async def translate(request: TranslationRequest):
     tgt_lang = request.tgt_lang
 
 
+    print("revied-requerst")
         # Translation task
     #tgt_lang = "Hindi"
     #input_txt = "Be the change you wish to see in the world."
