@@ -42,7 +42,12 @@ if __name__ == "__main__":
     text = "hi"
     #result = translate_text(file_content)
 
-    result = translate_text(text)
+    result = translate_text(text , src_lang="english", tgt_lang= "kannada")
 
+
+
+#    text = "ಹಾಯ್"
+
+#    result = translate_text(text , src_lang="kannada", tgt_lang= "english")
 
     print(result)
