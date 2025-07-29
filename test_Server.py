@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     result = translate_text(text , src_lang="english", tgt_lang= "kannada")
 
-
+    print(result)
 
     text = "ಹಾಯ್"
 

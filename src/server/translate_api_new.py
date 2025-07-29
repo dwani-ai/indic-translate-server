@@ -1,5 +1,5 @@
 import torch
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Dict
 import argparse
@@ -30,7 +30,7 @@ async def home():
     return RedirectResponse(url="/docs")
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate(request: TranslationRequest):
+async def translate(request: TranslationRequest,test_str:str= Query(...), test_str2:str= Query(...)):
     try:
         input_sentences = request.sentences.strip()  # Remove leading/trailing whitespace
         src_lang = request.src_lang.lower().strip()
