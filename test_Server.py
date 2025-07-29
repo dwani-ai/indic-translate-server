@@ -9,7 +9,7 @@ base_url = os.getenv("TRANSLATE_API_BASE_URL")
 def translate_text(sentence, src_lang="english", tgt_lang="kannada"):
     
     
-    url = f"{base_url}"
+    url = f"{base_url}?src_lang={src_lang}&tgt_lang={tgt_lang}"
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json"

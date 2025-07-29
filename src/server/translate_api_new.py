@@ -8,6 +8,29 @@ from fastapi.responses import RedirectResponse
 import uvicorn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+# Language options with names and codes
+language_options = [
+    ("English", "eng_Latn"),
+    ("Kannada", "kan_Knda"),
+    ("Hindi", "hin_Deva"), 
+    ("Assamese", "asm_Beng"),
+    ("Bengali", "ben_Beng"),
+    ("Gujarati", "guj_Gujr"),
+    ("Malayalam", "mal_Mlym"),
+    ("Marathi", "mar_Deva"),
+    ("Odia", "ory_Orya"),
+    ("Punjabi", "pan_Guru"),
+    ("Tamil", "tam_Taml"),
+    ("Telugu", "tel_Telu"),
+    ("German", "deu_Latn"),
+]
+
+# Create mappings for language names and codes
+name_to_code = {name.lower(): code for name, code in language_options}
+code_to_name = {code.lower(): name for name, code in language_options}
+valid_names = set(name_to_code.keys())
+valid_codes = set(code_to_name.keys())
+
 model_name = "sarvamai/sarvam-translate"
 
 # Load tokenizer and model
@@ -19,8 +42,8 @@ app = FastAPI()
 
 class TranslationRequest(BaseModel):
     sentences: str
-    src_lang: str
-    tgt_lang: str
+    src_lang: str  # Can be language name (e.g., "English") or code (e.g., "eng_Latn")
+    tgt_lang: str  # Can be language name (e.g., "Hindi") or code (e.g., "hin_Deva")
 
 class TranslationResponse(BaseModel):
     translations: str
@@ -30,9 +53,10 @@ async def home():
     return RedirectResponse(url="/docs")
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate(request: TranslationRequest,src_lang:str= Query(...), tgt_lang:str= Query(...)):
+async def translate(request: TranslationRequest, src_lang: str = Query(...), tgt_lang: str = Query(...)):
     try:
-        input_sentences = request.sentences.strip()  # Remove leading/trailing whitespace
+        # Clean and normalize inputs
+        input_sentences = request.sentences.strip()
         src_lang = request.src_lang.lower().strip()
         tgt_lang = request.tgt_lang.lower().strip()
 
@@ -43,12 +67,33 @@ async def translate(request: TranslationRequest,src_lang:str= Query(...), tgt_la
             raise HTTPException(status_code=400, detail="Source and target languages must be provided")
         if src_lang == tgt_lang:
             raise HTTPException(status_code=400, detail="Source and target languages must be different")
-        if src_lang != "english" and tgt_lang != "english":
+
+        # Convert inputs to language names and codes
+        if src_lang in valid_names:
+            src_name = src_lang
+            src_code = name_to_code[src_lang]
+        elif src_lang in valid_codes:
+            src_name = code_to_name[src_lang]
+            src_code = src_lang
+        else:
+            raise HTTPException(status_code=400, detail=f"Invalid source language. Supported: {', '.join(valid_names)} or their codes.")
+
+        if tgt_lang in valid_names:
+            tgt_name = tgt_lang
+            tgt_code = name_to_code[tgt_lang]
+        elif tgt_lang in valid_codes:
+            tgt_name = code_to_name[tgt_lang]
+            tgt_code = tgt_lang
+        else:
+            raise HTTPException(status_code=400, detail=f"Invalid target language. Supported: {', '.join(valid_names)} or their codes.")
+
+        # Validate that one language is English
+        if src_name != "english" and tgt_name != "english":
             raise HTTPException(status_code=400, detail="One of source or target language must be English")
 
-        # Prepare chat-style message prompt
+        # Prepare chat-style message prompt using language names
         messages = [
-            {"role": "system", "content": f"Translate the text below to {tgt_lang}."},
+            {"role": "system", "content": f"Translate the text below to {tgt_name}."},
             {"role": "user", "content": input_sentences}
         ]
 
@@ -59,8 +104,10 @@ async def translate(request: TranslationRequest,src_lang:str= Query(...), tgt_la
             add_generation_prompt=True
         )
 
-        # Tokenize and move input to model device
-        model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+        # Tokenize and move input to model device, including language codes if needed
+        # Assuming the model uses codes internally, prepend them to the input text
+        text_with_codes = f"[{src_code} to {tgt_code}] {text}"
+        model_inputs = tokenizer([text_with_codes], return_tensors="pt").to(model.device)
 
         # Generate the output
         generated_ids = model.generate(
@@ -80,9 +127,7 @@ async def translate(request: TranslationRequest,src_lang:str= Query(...), tgt_la
         return TranslationResponse(translations=output_text)
 
     except Exception as e:
-        # Log the exception for debugging
         print(f"Error during translation: {str(e)}")
-        # Raise an HTTPException with a meaningful message
         raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
 
 def parse_args():
