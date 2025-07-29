@@ -56,3 +56,11 @@ if __name__ == "__main__":
     result = translate_text(text , src_lang="kan_Knda", tgt_lang= "eng_Latn")
 
     print(result)
+
+
+    text = "hi"
+    #result = translate_text(file_content)
+
+    result = translate_text(text , src_lang="eng_Latn", tgt_lang= "kan_Knda")
+
+    print(result)

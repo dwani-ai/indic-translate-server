@@ -1,7 +1,7 @@
 import torch
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Union
 import argparse
 import os
 from fastapi.responses import RedirectResponse
@@ -12,7 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 language_options = [
     ("English", "eng_Latn"),
     ("Kannada", "kan_Knda"),
-    ("Hindi", "hin_Deva"), 
+    ("Hindi", "hin_Deva"),
     ("Assamese", "asm_Beng"),
     ("Bengali", "ben_Beng"),
     ("Gujarati", "guj_Gujr"),
@@ -41,12 +41,12 @@ model = AutoModelForCausalLM.from_pretrained(model_name).to(DEVICE)
 app = FastAPI()
 
 class TranslationRequest(BaseModel):
-    sentences: str
+    sentences: Union[str, List[str]]  # Accept either a string or list of strings
     src_lang: str  # Can be language name (e.g., "English", "english") or code (e.g., "eng_Latn", "ENG_LATN")
     tgt_lang: str  # Can be language name (e.g., "Hindi", "hindi") or code (e.g., "hin_Deva", "HIN_DEVA")
 
 class TranslationResponse(BaseModel):
-    translations: str
+    translations: Union[str, List[str]]  # Return a string or list of strings based on input
 
 @app.get("/")
 async def home():
@@ -55,20 +55,17 @@ async def home():
 @app.post("/translate", response_model=TranslationResponse)
 async def translate(request: TranslationRequest, src_lang: str = Query(...), tgt_lang: str = Query(...)):
     try:
-        # Clean and normalize inputs
-        input_sentences = request.sentences.strip()
+        # Clean and normalize language inputs
         src_lang = request.src_lang.lower().strip()
         tgt_lang = request.tgt_lang.lower().strip()
 
-        # Validate inputs
-        if not input_sentences:
-            raise HTTPException(status_code=400, detail="Input sentences cannot be empty")
+        # Validate language inputs
         if not src_lang or not tgt_lang:
             raise HTTPException(status_code=400, detail="Source and target languages must be provided")
         if src_lang == tgt_lang:
             raise HTTPException(status_code=400, detail="Source and target languages must be different")
 
-        # Convert inputs to language names and codes
+        # Convert language inputs to names and codes
         if src_lang in valid_names:
             src_name = code_to_name.get(src_lang, next(name for name, _ in language_options if name.lower() == src_lang))
             src_code = name_to_code[src_lang]
@@ -91,39 +88,56 @@ async def translate(request: TranslationRequest, src_lang: str = Query(...), tgt
         if src_name.lower() != "english" and tgt_name.lower() != "english":
             raise HTTPException(status_code=400, detail="One of source or target language must be English")
 
-        # Prepare chat-style message prompt using language names
-        messages = [
-            {"role": "system", "content": f"Translate the text below to {tgt_name}."},
-            {"role": "user", "content": input_sentences}
-        ]
+        # Handle string or list of strings
+        input_sentences = request.sentences
+        if isinstance(input_sentences, str):
+            input_sentences = [input_sentences]
+        elif not input_sentences:
+            raise HTTPException(status_code=400, detail="Input sentences cannot be empty")
 
-        # Apply chat template
-        text = tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
+        # Validate each sentence
+        for sentence in input_sentences:
+            if not sentence.strip():
+                raise HTTPException(status_code=400, detail="Input sentences cannot contain empty strings")
 
-        # Tokenize and move input to model device, including language codes
-        text_with_codes = f"[{src_code} to {tgt_code}] {text}"
-        model_inputs = tokenizer([text_with_codes], return_tensors="pt").to(model.device)
+        # Translate each sentence
+        translations = []
+        for sentence in input_sentences:
+            # Prepare chat-style message prompt using language names
+            messages = [
+                {"role": "system", "content": f"Translate the text below to {tgt_name}."},
+                {"role": "user", "content": sentence.strip()}
+            ]
 
-        # Generate the output
-        generated_ids = model.generate(
-            **model_inputs,
-            max_new_tokens=1024,
-            do_sample=True,
-            temperature=0.01,
-            num_return_sequences=1,
-            use_cache=False
-        )
-        output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
-        output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
+            # Apply chat template
+            text = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
 
-        print(f"Input: {input_sentences}")
-        print(f"Translation: {output_text}")
+            # Tokenize and move input to model device, including language codes
+            text_with_codes = f"[{src_code} to {tgt_code}] {text}"
+            model_inputs = tokenizer([text_with_codes], return_tensors="pt").to(model.device)
 
-        return TranslationResponse(translations=output_text)
+            # Generate the output
+            generated_ids = model.generate(
+                **model_inputs,
+                max_new_tokens=1024,
+                do_sample=True,
+                temperature=0.01,
+                num_return_sequences=1,
+                use_cache=False
+            )
+            output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
+            output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
+
+            print(f"Input: {sentence}")
+            print(f"Translation: {output_text}")
+            translations.append(output_text)
+
+        # Return single string or list based on input type
+        return TranslationResponse(translations=translations[0] if len(translations) == 1 else translations)
 
     except Exception as e:
         print(f"Error during translation: {str(e)}")
