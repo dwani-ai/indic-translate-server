@@ -1,6 +1,7 @@
 import requests
 import os
 
+# python src/server/translate_api_new.py --host 0.0.0.0 --port 9862 --device cuda
 # Set API key and base URL
 base_url = os.getenv("TRANSLATE_API_BASE_URL")
 
@@ -14,7 +15,7 @@ def translate_text(sentence, src_lang="eng_Latn", tgt_lang="kan_Knda"):
         "Content-Type": "application/json"
     }
     data = {
-        "sentences": [sentence],
+        "sentences": sentence,
         "src_lang": src_lang,
         "tgt_lang": tgt_lang
     }
