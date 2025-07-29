@@ -1,10 +1,18 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from bitsandbytes import quantize_model
+import torch
 
 model_name = "sarvamai/sarvam-translate"
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
+
+# Load model with 4-bit quantization
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    load_in_4bit=True,  # Enable 4-bit quantization
+    device_map="auto"   # Automatically map to available devices (e.g., CUDA)
+)
 
 # Translation task
 tgt_lang = "Hindi"

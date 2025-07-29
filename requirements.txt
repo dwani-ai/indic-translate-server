@@ -4,5 +4,6 @@ fastapi
 uvicorn
 pydantic
 sentencepience
+bitsandbytes
 indic-nlp-library-itt
 IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git
