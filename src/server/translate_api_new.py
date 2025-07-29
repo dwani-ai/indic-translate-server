@@ -30,7 +30,7 @@ async def home():
     return RedirectResponse(url="/docs")
 
 @app.post("/translate", response_model=TranslationResponse)
-async def translate(request: TranslationRequest,test_str:str= Query(...), test_str2:str= Query(...)):
+async def translate(request: TranslationRequest,src_lang:str= Query(...), tgt_lang:str= Query(...)):
     try:
         input_sentences = request.sentences.strip()  # Remove leading/trailing whitespace
         src_lang = request.src_lang.lower().strip()
