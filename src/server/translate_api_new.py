@@ -57,7 +57,7 @@ async def translate(request: TranslationRequest):
             {"role": "user", "content": str(input_sentences)}
         ]
 
-        print(messages)
+        #print(messages)
         # Apply chat template to structure the conversation
         text = tokenizer.apply_chat_template(
             messages,

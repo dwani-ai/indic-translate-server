@@ -6,7 +6,7 @@ import os
 base_url = os.getenv("TRANSLATE_API_BASE_URL")
 
 
-def translate_text(sentence, src_lang="eng_Latn", tgt_lang="kan_Knda"):
+def translate_text(sentence, src_lang="english", tgt_lang="kannada"):
     
     
     url = f"{base_url}"
