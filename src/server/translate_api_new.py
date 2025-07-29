@@ -25,7 +25,7 @@ language_options = [
     ("German", "deu_Latn"),
 ]
 
-# Create mappings for language names and codes
+# Create mappings for language names and codes (case-insensitive)
 name_to_code = {name.lower(): code for name, code in language_options}
 code_to_name = {code.lower(): name for name, code in language_options}
 valid_names = set(name_to_code.keys())
@@ -42,8 +42,8 @@ app = FastAPI()
 
 class TranslationRequest(BaseModel):
     sentences: str
-    src_lang: str  # Can be language name (e.g., "English") or code (e.g., "eng_Latn")
-    tgt_lang: str  # Can be language name (e.g., "Hindi") or code (e.g., "hin_Deva")
+    src_lang: str  # Can be language name (e.g., "English", "english") or code (e.g., "eng_Latn", "ENG_LATN")
+    tgt_lang: str  # Can be language name (e.g., "Hindi", "hindi") or code (e.g., "hin_Deva", "HIN_DEVA")
 
 class TranslationResponse(BaseModel):
     translations: str
@@ -70,25 +70,25 @@ async def translate(request: TranslationRequest, src_lang: str = Query(...), tgt
 
         # Convert inputs to language names and codes
         if src_lang in valid_names:
-            src_name = src_lang
+            src_name = code_to_name.get(src_lang, next(name for name, _ in language_options if name.lower() == src_lang))
             src_code = name_to_code[src_lang]
         elif src_lang in valid_codes:
             src_name = code_to_name[src_lang]
             src_code = src_lang
         else:
-            raise HTTPException(status_code=400, detail=f"Invalid source language. Supported: {', '.join(valid_names)} or their codes.")
+            raise HTTPException(status_code=400, detail=f"Invalid source language. Supported: {', '.join(name for name, _ in language_options)} or their codes.")
 
         if tgt_lang in valid_names:
-            tgt_name = tgt_lang
+            tgt_name = code_to_name.get(tgt_lang, next(name for name, _ in language_options if name.lower() == tgt_lang))
             tgt_code = name_to_code[tgt_lang]
         elif tgt_lang in valid_codes:
             tgt_name = code_to_name[tgt_lang]
             tgt_code = tgt_lang
         else:
-            raise HTTPException(status_code=400, detail=f"Invalid target language. Supported: {', '.join(valid_names)} or their codes.")
+            raise HTTPException(status_code=400, detail=f"Invalid target language. Supported: {', '.join(name for name, _ in language_options)} or their codes.")
 
         # Validate that one language is English
-        if src_name != "english" and tgt_name != "english":
+        if src_name.lower() != "english" and tgt_name.lower() != "english":
             raise HTTPException(status_code=400, detail="One of source or target language must be English")
 
         # Prepare chat-style message prompt using language names
@@ -104,8 +104,7 @@ async def translate(request: TranslationRequest, src_lang: str = Query(...), tgt
             add_generation_prompt=True
         )
 
-        # Tokenize and move input to model device, including language codes if needed
-        # Assuming the model uses codes internally, prepend them to the input text
+        # Tokenize and move input to model device, including language codes
         text_with_codes = f"[{src_code} to {tgt_code}] {text}"
         model_inputs = tokenizer([text_with_codes], return_tensors="pt").to(model.device)
 

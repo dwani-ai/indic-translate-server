@@ -51,3 +51,8 @@ if __name__ == "__main__":
     result = translate_text(text , src_lang="kannada", tgt_lang= "english")
 
     print(result)
+
+
+    result = translate_text(text , src_lang="kan_Knda", tgt_lang= "eng_Latn")
+
+    print(result)
