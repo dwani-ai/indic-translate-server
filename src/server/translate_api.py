@@ -52,8 +52,8 @@ class ModelManager:
     def preload_models(self):
         # Preload all models at startup
         self.models['eng_indic'] = TranslateManager('eng_Latn', 'kan_Knda', self.device_type, self.use_distilled)
-        #self.models['indic_eng'] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
-        #self.models['indic_indic'] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
+        self.models['indic_eng'] = TranslateManager('kan_Knda', 'eng_Latn', self.device_type, self.use_distilled)
+        self.models['indic_indic'] = TranslateManager('kan_Knda', 'hin_Deva', self.device_type, self.use_distilled)
 
     def get_model(self, src_lang, tgt_lang) -> TranslateManager:
         if src_lang.startswith("eng") and not tgt_lang.startswith("eng"):
