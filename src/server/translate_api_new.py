@@ -40,52 +40,54 @@ async def home():
 
 @app.post("/translate", response_model=TranslationResponse)
 async def translate(request: TranslationRequest):
-    input_sentences = request.sentences
-    src_lang = request.src_lang
-    tgt_lang = request.tgt_lang
+    try:
+        input_sentences = request.sentences
+        src_lang = request.src_lang
+        tgt_lang = request.tgt_lang
 
 
-    print("revied-requerst")
-        # Translation task
-    #tgt_lang = "Hindi"
-    #input_txt = "Be the change you wish to see in the world."
+        print("revied-requerst")
+            # Translation task
+        #tgt_lang = "Hindi"
+        #input_txt = "Be the change you wish to see in the world."
 
-    # Chat-style message prompt
-    messages = [
-        {"role": "system", "content": f"Translate the text below to {tgt_lang}."},
-        {"role": "user", "content": str(input_sentences)}
-    ]
+        # Chat-style message prompt
+        messages = [
+            {"role": "system", "content": f"Translate the text below to {tgt_lang}."},
+            {"role": "user", "content": str(input_sentences)}
+        ]
 
-    # Apply chat template to structure the conversation
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=True
-    )
+        # Apply chat template to structure the conversation
+        text = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
 
-    # Tokenize and move input to model device
-    model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+        # Tokenize and move input to model device
+        model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
-    # Generate the output
-    generated_ids = model.generate(
-        **model_inputs,
-        max_new_tokens=1024,
-        do_sample=True,
-        temperature=0.01,
-        num_return_sequences=1
-    )
-    output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
-    output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
+        # Generate the output
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=1024,
+            do_sample=True,
+            temperature=0.01,
+            num_return_sequences=1
+        )
+        output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
+        output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
 
-    print("Input:", str(input_sentences))
-    print("Translation:", output_text)
+        print("Input:", str(input_sentences))
+        print("Translation:", output_text)
 
 
-    if not input_sentences:
-        raise HTTPException(status_code=400, detail="Input sentences are required")
+        if not input_sentences:
+            raise HTTPException(status_code=400, detail="Input sentences are required")
 
-    return TranslationResponse(translations=output_text)
-
+        return TranslationResponse(translations=output_text)
+    except Exception:
+        print("exceptin")
 # Function to parse command-line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="Translation Server")
