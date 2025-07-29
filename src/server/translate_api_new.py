@@ -26,12 +26,12 @@ model = AutoModelForCausalLM.from_pretrained(model_name).to(DEVICE)
 app = FastAPI()
 
 class TranslationRequest(BaseModel):
-    sentences: List[str]
+    sentences: str
     src_lang: str
     tgt_lang: str
 
 class TranslationResponse(BaseModel):
-    translations: List[str]
+    translations: str
 
 
 @app.get("/")

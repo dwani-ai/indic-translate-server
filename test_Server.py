@@ -38,9 +38,10 @@ if __name__ == "__main__":
     # Now file_content holds the entire content of the file as a string
     print(file_content)
     
-    #text = "hi"
-    result = translate_text(file_content)
+    text = "hi"
+    #result = translate_text(file_content)
 
+    result = translate_text(text)
 
 
     print(result)
