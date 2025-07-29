@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
 
 
-#    text = "ಹಾಯ್"
+    text = "ಹಾಯ್"
 
-#    result = translate_text(text , src_lang="kannada", tgt_lang= "english")
+    result = translate_text(text , src_lang="kannada", tgt_lang= "english")
 
     print(result)

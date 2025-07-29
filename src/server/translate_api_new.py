@@ -68,7 +68,8 @@ async def translate(request: TranslationRequest):
             max_new_tokens=1024,
             do_sample=True,
             temperature=0.01,
-            num_return_sequences=1
+            num_return_sequences=1,
+            use_cache=False
         )
         output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
         output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
