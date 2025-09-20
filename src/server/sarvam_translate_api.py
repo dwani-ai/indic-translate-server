@@ -7,6 +7,7 @@ import uvicorn
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+DEVICE = "cuda"
 # Load model and tokenizer on startup
 MODEL_NAME = "sarvamai/sarvam-translate"
 try:
@@ -14,7 +15,7 @@ try:
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME,
         trust_remote_code=True,
-        torch_dtype=torch.float32  # Use full precision to avoid FP16 issues
+        torch_dtype=torch.float32  # Full precision to avoid CUDA issues
     ).to(DEVICE)
 except Exception as e:
     print(f"Error loading model: {str(e)}")
@@ -45,7 +46,7 @@ async def translate(request: TranslationRequest):
     translations = []
     try:
         for sentence in input_sentences:
-            # Create prompt
+            # Create prompt (adjusted for sarvam-translate)
             prompt = f"Translate the following text from {src_lang} to {tgt_lang}: {sentence}"
             # Tokenize input
             model_inputs = tokenizer(
@@ -59,15 +60,15 @@ async def translate(request: TranslationRequest):
             with torch.no_grad():
                 generated_ids = model.generate(
                     **model_inputs,
-                    max_new_tokens=1024,
-                    do_sample=False,  # Greedy decoding for stability
-                    num_beams=5,
+                    max_new_tokens=256,  # Reduced for stability
+                    do_sample=False,     # Greedy decoding to avoid CUDA errors
+                    num_beams=4,         # Moderate beam search
                     num_return_sequences=1
                 )
             # Decode output
             output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
             output_text = tokenizer.decode(output_ids, skip_special_tokens=True)
-            translations.append(output_text)
+            translations.append(output_text.strip())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Translation error: {str(e)}")
 
