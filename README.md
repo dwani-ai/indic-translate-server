@@ -219,12 +219,12 @@ python translate_code.py
 You can run the server using FastAPI:
 1. with GPU 
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda --use_distilled False
 ```
 
 2. with CPU only
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cpu --use_distilled False
 ```
 
 ### Evaluating Results for FastAPI Server
