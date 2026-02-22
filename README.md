@@ -393,6 +393,9 @@ note={}
 
 <!--
 
+https://github.com/AI4Bharat/IndicTrans2?tab=readme-ov-file#ct2-inference
+
+
 
 ### How to Use the Service
 
