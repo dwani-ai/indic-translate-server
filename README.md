@@ -245,14 +245,14 @@ curl -X 'POST' \
 ```
 
 ### Response
-
+```
 {
   "translations": [
     "हैलो, कैसा लग रहा है? ",
     "गुड मॉर्निंग! "
   ]
 }
-
+```
 ----
 
 
@@ -328,20 +328,6 @@ Also you can join the [discord group](https://discord.gg/WZMCerEZ2P) to collabor
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## FAQ
-
-**Q: How do I change the source and target languages?**
-
-A: Modify the `compose.yaml` file to set the `SRC_LANG` and `TGT_LANG` variables as needed.
-
-**Q: How do I download the translation models?**
-
-A: Use the `huggingface-cli` commands provided in the [Downloading Translation Models](#downloading-translation-models) section.
-
-**Q: How do I run the server locally?**
-
-A: Follow the instructions in the [Running with FastAPI Server](#running-with-fastapi-server) section.
 
 ---
 #### License
