@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Live Server](#live-server)
 - [Prerequisites](#prerequisites)
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
 - [Downloading Translation Models](#downloading-translation-models)
@@ -21,71 +20,18 @@ This project sets up an Indic translation server, allowing translation between v
 
 We suggest to use non-distilled models for better translation. 
 
-###  Languages Supported
-Here is the list of languages supported by the IndicTrans2 models:
-
-<table>
-<tbody>
-  <tr>
-    <td>Assamese (asm_Beng)</td>
-    <td>Kashmiri (Arabic) (kas_Arab)</td>
-    <td>Punjabi (pan_Guru)</td>
-  </tr>
-  <tr>
-    <td>Bengali (ben_Beng)</td>
-    <td>Kashmiri (Devanagari) (kas_Deva)</td>
-    <td>Sanskrit (san_Deva)</td>
-  </tr>
-  <tr>
-    <td>Bodo (brx_Deva)</td>
-    <td>Maithili (mai_Deva)</td>
-    <td>Santali (sat_Olck)</td>
-  </tr>
-  <tr>
-    <td>Dogri (doi_Deva)</td>
-    <td>Malayalam (mal_Mlym)</td>
-    <td>Sindhi (Arabic) (snd_Arab)</td>
-  </tr>
-  <tr>
-    <td>English (eng_Latn)</td>
-    <td>Marathi (mar_Deva)</td>
-    <td>Sindhi (Devanagari) (snd_Deva)</td>
-  </tr>
-  <tr>
-    <td>Konkani (gom_Deva)</td>
-    <td>Manipuri (Bengali) (mni_Beng)</td>
-    <td>Tamil (tam_Taml)</td>
-  </tr>
-  <tr>
-    <td>Gujarati (guj_Gujr)</td>
-    <td>Manipuri (Meitei) (mni_Mtei)</td>
-    <td>Telugu (tel_Telu)</td>
-  </tr>
-  <tr>
-    <td>Hindi (hin_Deva)</td>
-    <td>Nepali (npi_Deva)</td>
-    <td>Urdu (urd_Arab)</td>
-  </tr>
-  <tr>
-    <td>Kannada (kan_Knda)</td>
-    <td>Odia (ory_Orya)</td>
-    <td></td>
-  </tr>
-</tbody>
-</table>
-
 
 ### Live Server
 
 We have hosted an Translation service for Indian languages. 
 
 ####  
-- [https://demo.dwani.ai](https://demo.dwani.ai)
+- [https://workshop.dwani.ai](https://workshop.dwani.ai)
 
 
 ## Prerequisites
 
-- Python 3.10  + VsCode
+- Python 3.10 
 - Ubuntu 22.04 
 - Internet access to download translation models.
 
@@ -109,13 +55,12 @@ We have hosted an Translation service for Indian languages.
 
 3. **Install dependencies:**
    ```
-   
-pip install torch==2.7.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
    pip install -r requirements.txt
    ```
 
 ### Model Downloads for Translation
 
+- Request  Access permission for the model form HuggingFace 
 - Collection Models on HuggingFace - [IndicTrans2](https://huggingface.co/collections/ai4bharat/indictrans2-664ccb91d23bbae0d681c3ca)
 
 Below is a table summarizing the available models for different translation tasks:
@@ -217,15 +162,17 @@ python translate_code.py
 
 
 You can run the server using FastAPI:
-1. with GPU 
+1. with Distilled model
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cuda --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda --use_distilled
 ```
 
-2. with CPU only
+2. with non-distilled model
 ```bash
-python src/server/translate_api.py --port 7860 --host 0.0.0.0 --device cpu --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda 
 ```
+
+
 
 ### Evaluating Results for FastAPI Server
 
@@ -234,7 +181,7 @@ You can evaluate the translation results using `curl` commands. Here are some ex
 #### English to Kannada
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
+  'http://localhost:10802/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -260,7 +207,7 @@ curl -X 'POST' \
 
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  'http://localhost:10802/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -284,7 +231,7 @@ curl -X 'POST' \
 #### Kannada to Hindi 
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=hin_Deva' \
+  'http://localhost:10802/translate?src_lang=kan_Knda&tgt_lang=hin_Deva' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -298,40 +245,71 @@ curl -X 'POST' \
 ```
 
 ### Response
-
+```
 {
   "translations": [
     "हैलो, कैसा लग रहा है? ",
     "गुड मॉर्निंग! "
   ]
 }
-
+```
 ----
 
-#### CPU
-```bash
-curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cpu' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sentences": [
-    "ನಮಸ್ಕಾರ, ಹೇಗಿದ್ದೀರಾ?", "ಶುಭೋದಯ!"
-  ],
-  "src_lang": "kan_Knda",
-  "tgt_lang": "eng_Latn"
-}'
-```
 
-### Response
-```json
-{
-  "translations": [
-    "Hello, how are you?",
-    "Good morning!"
-  ]
-}
-```
+###  Languages Supported
+Here is the list of languages supported by the IndicTrans2 models:
+
+<table>
+<tbody>
+  <tr>
+    <td>Assamese (asm_Beng)</td>
+    <td>Kashmiri (Arabic) (kas_Arab)</td>
+    <td>Punjabi (pan_Guru)</td>
+  </tr>
+  <tr>
+    <td>Bengali (ben_Beng)</td>
+    <td>Kashmiri (Devanagari) (kas_Deva)</td>
+    <td>Sanskrit (san_Deva)</td>
+  </tr>
+  <tr>
+    <td>Bodo (brx_Deva)</td>
+    <td>Maithili (mai_Deva)</td>
+    <td>Santali (sat_Olck)</td>
+  </tr>
+  <tr>
+    <td>Dogri (doi_Deva)</td>
+    <td>Malayalam (mal_Mlym)</td>
+    <td>Sindhi (Arabic) (snd_Arab)</td>
+  </tr>
+  <tr>
+    <td>English (eng_Latn)</td>
+    <td>Marathi (mar_Deva)</td>
+    <td>Sindhi (Devanagari) (snd_Deva)</td>
+  </tr>
+  <tr>
+    <td>Konkani (gom_Deva)</td>
+    <td>Manipuri (Bengali) (mni_Beng)</td>
+    <td>Tamil (tam_Taml)</td>
+  </tr>
+  <tr>
+    <td>Gujarati (guj_Gujr)</td>
+    <td>Manipuri (Meitei) (mni_Mtei)</td>
+    <td>Telugu (tel_Telu)</td>
+  </tr>
+  <tr>
+    <td>Hindi (hin_Deva)</td>
+    <td>Nepali (npi_Deva)</td>
+    <td>Urdu (urd_Arab)</td>
+  </tr>
+  <tr>
+    <td>Kannada (kan_Knda)</td>
+    <td>Odia (ory_Orya)</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+
+
 
 
 ## References
@@ -350,20 +328,6 @@ Also you can join the [discord group](https://discord.gg/WZMCerEZ2P) to collabor
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## FAQ
-
-**Q: How do I change the source and target languages?**
-
-A: Modify the `compose.yaml` file to set the `SRC_LANG` and `TGT_LANG` variables as needed.
-
-**Q: How do I download the translation models?**
-
-A: Use the `huggingface-cli` commands provided in the [Downloading Translation Models](#downloading-translation-models) section.
-
-**Q: How do I run the server locally?**
-
-A: Follow the instructions in the [Running with FastAPI Server](#running-with-fastapi-server) section.
 
 ---
 #### License
