@@ -80,7 +80,7 @@ Here is the list of languages supported by the IndicTrans2 models:
 We have hosted an Translation service for Indian languages. 
 
 ####  
-- [https://demo.dwani.ai](https://demo.dwani.ai)
+- [https://workshop.dwani.ai](https://workshop.dwani.ai)
 
 
 ## Prerequisites
@@ -109,13 +109,12 @@ We have hosted an Translation service for Indian languages.
 
 3. **Install dependencies:**
    ```
-   
-pip install torch==2.7.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
    pip install -r requirements.txt
    ```
 
 ### Model Downloads for Translation
 
+- Request  Access permission for the model form HuggingFace 
 - Collection Models on HuggingFace - [IndicTrans2](https://huggingface.co/collections/ai4bharat/indictrans2-664ccb91d23bbae0d681c3ca)
 
 Below is a table summarizing the available models for different translation tasks:

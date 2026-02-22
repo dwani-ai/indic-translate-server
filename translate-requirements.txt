@@ -19,7 +19,7 @@ huggingface-hub==0.34.3
 idna==3.10
 imagesize==1.4.1
 indic-nlp-library-itt==0.1.1
-IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git@37483c962c486f2f61d8b3f659c0a1064c55ac6c
+IndicTransToolkit @ git+https://github.com/dwani-ai/IndicTransToolkit.git
 Jinja2==3.1.6
 joblib==1.5.1
 lxml==6.0.0
