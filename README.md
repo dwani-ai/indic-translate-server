@@ -162,15 +162,17 @@ python translate_code.py
 
 
 You can run the server using FastAPI:
-1. with GPU 
+1. with Distilled model
 ```bash
-python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda --use_distilled
 ```
 
-2. with CPU only
+2. with non-distilled model
 ```bash
-python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cpu --use_distilled False
+python src/server/translate_api.py --port 10802 --host 0.0.0.0 --device cuda 
 ```
+
+
 
 ### Evaluating Results for FastAPI Server
 
@@ -179,7 +181,7 @@ You can evaluate the translation results using `curl` commands. Here are some ex
 #### English to Kannada
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
+  'http://localhost:10802/translate?tgt_lang=kan_Knda&src_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -205,7 +207,7 @@ curl -X 'POST' \
 
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
+  'http://localhost:10802/translate?src_lang=kan_Knda&tgt_lang=eng_Latn&device_type=cuda' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -229,7 +231,7 @@ curl -X 'POST' \
 #### Kannada to Hindi 
 ```bash
 curl -X 'POST' \
-  'http://localhost:7860/translate?src_lang=kan_Knda&tgt_lang=hin_Deva' \
+  'http://localhost:10802/translate?src_lang=kan_Knda&tgt_lang=hin_Deva' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
